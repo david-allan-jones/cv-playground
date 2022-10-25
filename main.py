@@ -12,7 +12,6 @@ def rotate_rgb(img, k):
     def rotate_rgb_helper(pixel):
         pixel[0], pixel[1], pixel[2] = pixel[k%3], pixel[(k+1)%3], pixel[(k+2)%3]
         return pixel
-
     return pixel_transform(img, rotate_rgb_helper)
 
 def simple_grayscale(img):
@@ -31,19 +30,25 @@ def weighted_grayscale(img, weights):
         pixel[2] = gray
     return pixel_transform(img, weighted_grayscale_helper)
 
+def colorimetric_grayscale(img):
+    return weighted_grayscale(img, [0.2126, 0.7152, 0.0722])
+
+def edge_detection(img):
+    return cv.filter2D(img, -1, np.array([
+        [-1, -1, -1],
+        [-1, 8, -1],
+        [-1, -1, -1]
+    ]))
+
 def main():
     img = cv.imread(sys.argv[1])
     cv.imshow('original', img)
     # cv.imshow('rotate_rgb', rotate_rgb(img, 1))
     # cv.imshow('simple_grayscale', simple_grayscale(img))
     # cv.imshow('weighted_grayscale', weighted_grayscale(img, [0.3, 0.59, 0.11]))
-    edgeDetectionKernel = np.array([
-        [-1, -1, -1],
-        [-1, 8, -1],
-        [-1, -1, -1]
-    ])
-    print(edgeDetectionKernel)
-    cv.imshow('cv', cv.filter2D(weighted_grayscale(img, [0.3, 0.59, 0.11]), -1, edgeDetectionKernel))
+    cv.imshow('colormetric_grayscale', colorimetric_grayscale(img))
+    cv.imshow('edge_detection', edge_detection(img))
+
     cv.waitKey(0)
     cv.destroyAllWindows()
 
